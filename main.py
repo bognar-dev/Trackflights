@@ -22,30 +22,34 @@ def flightsingermany():
     return flights
 
 
+def checkflights(flights, flights_old):
+    if len(flights) != len(flights_old):
+        print("New flight")
+        for flight in flights:
+            details = fr_api.get_flight_details(flight_id=flight.id)
+            try:
+                flight.set_flight_details(details)
+                flightdetail = f"Coming from: {flight.origin_airport_name},{flight.origin_airport_country_name}, Flying to: {flight.destination_airport_name},{flight.destination_airport_country_name}, number : {flight.number} "
+                print(flightdetail)
+                toast.show_toast(
+                    title="Look out of the window",
+                    msg=flightdetail,
+                    duration=5,
+                    icon_path="airplane.ico",
+                    threaded=True,
+                    callback_on_click=webbrowser.open_new_tab(f"https://www.flightradar24.com/{flight.id}")
+                )
+            except:
+                print("No details available")
+        flights_old = flights
+    else:
+        flights_old = flights
+    return flights, flights_old
+
+
 if __name__ == '__main__':
     flights_old = []
+    flights = []
     while True:
         flights = flightsinmonchengladbach()
-        print(len(flights))
-        if len(flights) != len(flights_old):
-            print("New flight")
-            for flight in flights:
-                details = fr_api.get_flight_details(flight_id=flight.id)
-                try:
-                    flight.set_flight_details(details)
-                    flightdetail = f"Coming from: {flight.origin_airport_name}, Flying to: {flight.destination_airport_name}, number : {flight.number}"
-                    print(flightdetail)
-                    toast.show_toast(
-                        "Look out of the window",
-                        flightdetail,
-                        duration=5,
-                        icon_path="airplane.jpg",
-                        threaded=True,
-                        callback_on_click=webbrowser.open_new(f"https://www.flightradar24.com/{flight.id}")
-                    )
-
-                except:
-                    print("No details available")
-            flights_old = flights
-        else:
-            flights_old = flights
+        flights, flights_old = checkflights(flights, flights_old)
