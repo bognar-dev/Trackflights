@@ -36,7 +36,7 @@ def checkflights(flights, flights_old):
                 flightdetail = f"from: {flight.origin_airport_name},{flight.origin_airport_country_name}, to: {flight.destination_airport_name},{flight.destination_airport_country_name}, number : {flight.number} "
                 print(flightdetail)
                 toast = Notification(
-                    app_id="Look out the Window!",
+                    app_id="Look out of the Window!",
                     title=flight.number,
                     msg=flightdetail,
                     icon=r"C:\Users\nikla\Documents\Studium\Niki\GDI\flights\airplane.ico"
