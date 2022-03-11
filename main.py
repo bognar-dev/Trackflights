@@ -1,9 +1,12 @@
 from FlightRadar24.api import FlightRadar24API
-from win10toast_click import ToastNotifier
+#from win10toast_click import ToastNotifier
 import webbrowser
+from winotify import Notification, audio
 
 fr_api = FlightRadar24API()
-toast = ToastNotifier()
+#toast = ToastNotifier()
+toast = Notification(app_id="Look out the window!",title="")
+toast.set_audio(audio.Reminder, loop=False)
 
 
 def flightsinmonchengladbach():
@@ -23,22 +26,31 @@ def flightsingermany():
 
 
 def checkflights(flights, flights_old):
+    print(len(flights))
     if len(flights) != len(flights_old):
         print("New flight")
         for flight in flights:
             details = fr_api.get_flight_details(flight_id=flight.id)
             try:
                 flight.set_flight_details(details)
-                flightdetail = f"Coming from: {flight.origin_airport_name},{flight.origin_airport_country_name}, Flying to: {flight.destination_airport_name},{flight.destination_airport_country_name}, number : {flight.number} "
+                flightdetail = f"from: {flight.origin_airport_name},{flight.origin_airport_country_name}, to: {flight.destination_airport_name},{flight.destination_airport_country_name}, number : {flight.number} "
                 print(flightdetail)
-                toast.show_toast(
+                toast = Notification(
+                    app_id="Look out the Window!",
+                    title=flight.number,
+                    msg=flightdetail,
+                    icon=r"C:\Users\nikla\Documents\Studium\Niki\GDI\flights\airplane.ico"
+                )
+                toast.add_actions(label="Button text",
+                                  launch=f"https://www.flightradar24.com/{flight.id}")
+                '''toast.show_toast(
                     title="Look out of the window",
                     msg=flightdetail,
                     duration=5,
                     icon_path="airplane.ico",
                     threaded=True,
                     callback_on_click=webbrowser.open_new_tab(f"https://www.flightradar24.com/{flight.id}")
-                )
+                )'''
             except:
                 print("No details available")
         flights_old = flights
