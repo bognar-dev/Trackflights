@@ -26,7 +26,6 @@ def flightsingermany():
 
 
 def checkflights(flights, flights_old):
-    print(len(flights))
     if len(flights) != len(flights_old):
         print("New flight")
         for flight in flights:
@@ -41,8 +40,9 @@ def checkflights(flights, flights_old):
                     msg=flightdetail,
                     icon=r"C:\Users\nikla\Documents\Studium\Niki\GDI\flights\airplane.ico"
                 )
-                toast.add_actions(label="Button text",
+                toast.add_actions(label="more details",
                                   launch=f"https://www.flightradar24.com/{flight.id}")
+                toast.show()
                 '''toast.show_toast(
                     title="Look out of the window",
                     msg=flightdetail,
