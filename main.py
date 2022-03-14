@@ -11,23 +11,31 @@ from winotify import Notification, audio
 toast = Notification(app_id="Look out the window!", title="")
 toast.set_audio(audio.Reminder, loop=False)
 
-#tkinter setup
+# tkinter setup
+sunny = False
 from tkinter import *
 from tkinter import messagebox
+
 win = Tk()
 win.title('Flights')
 win.geometry("200x200")
-win.resizable(0,0)
-def setsunny():
-    sunny = True
-    messagebox.showinfo("Changed weather condition", "You set the weather to sunny")
+win.resizable(0, 0)
+
+
+def setsunny(choice):
+    global sunny
+    sunny = choice
+    if sunny:
+        messagebox.showinfo("Changed weather condition", "You set the weather to sunny")
+    if not sunny:
+        messagebox.showinfo("Changed weather condition", "You set the weather to cloudy")
     return sunny
-def setcloudy():
-    sunny = False
-    messagebox.showinfo("Changed westher condition", "You set the weather to cloudy")
-    return sunny
-buttonSunny = tkinter.Button(win, text='Sunny', command = setsunny,width= 10)
-buttonCloudy = tkinter.Button(win, text='Cloudy', command= setcloudy,width= 10)
+
+
+buttonSunny = tkinter.Button(win, text='Sunny', command=lambda: setsunny(True), width=10).pack()
+buttonCloudy = tkinter.Button(win, text='Cloudy', command=lambda: setsunny(False), width=10).pack()
+win.mainloop()
+
 
 def flightsinmonchengladbachSunny():
     monchengladbach = {'tl_y': 51.186454, 'tl_x': 6.363371, 'br_y': 51.102381, 'br_x': 6.578291}
@@ -35,10 +43,15 @@ def flightsinmonchengladbachSunny():
     flights = fr_api.get_flights(bounds=bounds_mgl)
 
     return flights
+
+
 def flightsinmonchengladbachCloudy():
     monchengladbach = {'tl_y': 51.186454, 'tl_x': 6.363371, 'br_y': 51.102381, 'br_x': 6.578291}
     bounds_mgl = fr_api.get_bounds(monchengladbach)
     flights = fr_api.get_flights(bounds=bounds_mgl)
+    for flight in flights:
+        if flight.altitude >= 5000:
+           flights.pop(flight)
 
     return flights
 
@@ -51,7 +64,7 @@ def checkflights(flights, flights_old):
             try:
                 flight.set_flight_details(details)
                 flightdetail = f"from: {flight.origin_airport_name}, {flight.origin_airport_country_name}\n " \
-                               f" to: {flight.destination_airport_name}, {flight.destination_airport_country_name}"
+                               f"to: {flight.destination_airport_name}, {flight.destination_airport_country_name}"
                 print(flightdetail)
                 toast = Notification(
                     app_id="Look out of the Window!",
@@ -74,17 +87,13 @@ def checkflights(flights, flights_old):
 
 
 if __name__ == '__main__':
+
     flights_old = []
     flights = []
-    sunny = True
-    buttonSunny.pack()
-    buttonCloudy.pack()
-    win.mainloop()
     while True:
         while sunny:
             flights = flightsinmonchengladbachSunny()
             flights, flights_old = checkflights(flights, flights_old)
         while not sunny:
-            print("not sunny")
             flights = flightsinmonchengladbachCloudy()
             flights, flights_old = checkflights(flights, flights_old)
