@@ -50,6 +50,10 @@ def flightsinmonchengladbachCloudy():
         if flight.altitude >= 5000:
             flights.pop(flight)
         # TODO: Flights.pop not working can not be interpreted as an integer
+        #To solve this error, use the len() method to calculate the length of the “products” array.
+        # We can use this value in our for loop:
+        # for p in range(len(products)):
+
     return flights
 
 
