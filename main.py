@@ -49,10 +49,6 @@ def flightsinmonchengladbachCloudy():
     for flight in flights:
         if flight.altitude >= 5000:
             flights.remove(flight)
-        # TODO: Flights.pop not working can not be interpreted as an integer
-        #To solve this error, use the len() method to calculate the length of the “products” array.
-        # We can use this value in our for loop:
-        # for p in range(len(products)):
 
     return flights
 
@@ -67,12 +63,16 @@ def checkflights(flights, flights_old):
                 flight.set_flight_details(details)
                 flightdetail = f"from: {flight.origin_airport_name}, {flight.origin_airport_country_name}\n" \
                                f"to: {flight.destination_airport_name}, {flight.destination_airport_country_name}"
-                print(flightdetail)
+                if flight.altitude <= 5000:
+                    height = "take-off/landing"
+                else:
+                    height = "high in the air"
+                print(f"{flightdetail}\n{height}")
                 toast = Notification(
                     app_id="Look out of the Window!",
-                    title=flight.number,
+                    title=f"{flight.number}, {height}",
                     msg=flightdetail,
-                    duration='short',
+                    duration='long',
                     icon=r"C:\Users\nikla\Documents\Studium\Niki\GDI\flights\airplane.ico"
 
                 )
@@ -99,3 +99,6 @@ if __name__ == '__main__':
         while not sunny:
             flights = flightsinmonchengladbachCloudy()
             flights, flights_old = checkflights(flights, flights_old)
+
+
+
