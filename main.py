@@ -9,7 +9,7 @@ fr_api = FlightRadar24API()
 
 # winotify setup
 toast = Notification(app_id="Look out the window!", title="")
-toast.set_audio(audio.Reminder, loop=False)
+toast.set_audio(audio.Default, loop=False)
 
 # tkinter setup
 sunny = False
@@ -67,13 +67,12 @@ def checkflights(flights, flights_old):
                     height = "take-off/landing"
                 else:
                     height = "high in the air"
-                print(f"{flightdetail}\n{height}")
+                print(f"{flightdetail}\n{height}\n_______________________________________")
                 toast = Notification(
                     app_id="Look out of the Window!",
                     title=f"{flight.number}, {height}",
                     msg=flightdetail,
                     duration='long',
-                    icon=r"C:\Users\nikla\Documents\Studium\Niki\GDI\flights\airplane.ico"
 
                 )
                 toast.add_actions(label="more details",
@@ -81,11 +80,11 @@ def checkflights(flights, flights_old):
                 toast.show()
 
             except:
-                print("No details available")
+                print("No details available\n____________________________")
         flights_old = flights
     else:
         flights_old = flights
-    return flights, flights_old
+    return flights_old
 
 
 if __name__ == '__main__':
@@ -95,7 +94,7 @@ if __name__ == '__main__':
     while True:
         while sunny:
             flights = flightsinmonchengladbachsunny()
-            flights, flights_old = checkflights(flights, flights_old)
+            flights_old = checkflights(flights, flights_old)
         while not sunny:
             flights = flightsinmonchengladbachCloudy()
             flights, flights_old = checkflights(flights, flights_old)
