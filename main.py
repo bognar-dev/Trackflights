@@ -64,7 +64,7 @@ def checkflights(flights, flights_old):
                 flight.set_flight_details(details)
                 flightdetail = f"from: {flight.origin_airport_name}, {flight.origin_airport_country_name}\n" \
                                f"to: {flight.destination_airport_name}, {flight.destination_airport_country_name}"
-                if flight.altitude <= 5000:
+                if flight.altitude <= 7000:
                     if flight.time + TWENTY_MINS_IN_SEC > flight.time_details['scheduled']['arrival']:
                         height = "landing"
                     else:
