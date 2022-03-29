@@ -1,18 +1,21 @@
-import tkinter
-from winotify import Notification, audio
-from FlightRadar24.api import FlightRadar24API
-from tkinter import *
-from tkinter import messagebox
-
 # flightradar setup
+import tkinter
+
+from FlightRadar24.api import FlightRadar24API
+
 fr_api = FlightRadar24API()
 
 # winotify setup
+from winotify import Notification, audio
+
 toast = Notification(app_id="Look out the window!", title="")
-toast.set_audio(audio.Default, loop=False)
+toast.set_audio(audio.Reminder, loop=False)
 
 # tkinter setup
 sunny = False
+from tkinter import *
+from tkinter import messagebox
+
 win = Tk()
 win.title('Flights')
 win.geometry("200x200")
@@ -34,7 +37,7 @@ buttonCloudy = tkinter.Button(win, text='Cloudy', command=lambda: setsunny(False
 win.mainloop()
 
 
-def flightsinmonchengladbachsunny():
+def flightsinmonchengladbachSunny():
     monchengladbach = {'tl_y': 51.186454, 'tl_x': 6.363371, 'br_y': 51.102381, 'br_x': 6.578291}
     bounds_mgl = fr_api.get_bounds(monchengladbach)
     flights = fr_api.get_flights(bounds=bounds_mgl)
@@ -48,35 +51,27 @@ def flightsinmonchengladbachCloudy():
     flights = fr_api.get_flights(bounds=bounds_mgl)
     for flight in flights:
         if flight.altitude >= 5000:
-            flights.remove(flight)
+           flights.pop(flight)
 
     return flights
 
 
 def checkflights(flights, flights_old):
-    TWENTY_MINS_IN_SEC = 1200
-    # TODO: Make console output correct
-    if len(flights) > len(flights_old):
+    if len(flights) != len(flights_old):
         print("New flight")
-        for flight in flights[len(flights_old):]:
+        for flight in flights:
             details = fr_api.get_flight_details(flight_id=flight.id)
             try:
                 flight.set_flight_details(details)
-                flightdetail = f"from: {flight.origin_airport_name}, {flight.origin_airport_country_name}\n" \
+                flightdetail = f"from: {flight.origin_airport_name}, {flight.origin_airport_country_name}\n " \
                                f"to: {flight.destination_airport_name}, {flight.destination_airport_country_name}"
-                if flight.altitude <= 7000:
-                    if flight.time + TWENTY_MINS_IN_SEC > flight.time_details['scheduled']['arrival']:
-                        height = "landing"
-                    else:
-                        height = "take-off"
-                else:
-                    height = "high in the air"
-                print(f"{flightdetail}\n{height}\n_______________________________________")
+                print(flightdetail)
                 toast = Notification(
                     app_id="Look out of the Window!",
-                    title=f"{flight.number}, {height}",
+                    title=flight.number,
                     msg=flightdetail,
-                    duration='long',
+                    duration='short',
+                    icon=r"C:\Users\nikla\Documents\Studium\Niki\GDI\flights\airplane.ico"
 
                 )
                 toast.add_actions(label="more details",
@@ -84,11 +79,11 @@ def checkflights(flights, flights_old):
                 toast.show()
 
             except:
-                print("No details available\n____________________________")
+                print("No details available")
         flights_old = flights
     else:
         flights_old = flights
-    return flights_old
+    return flights, flights_old
 
 
 if __name__ == '__main__':
@@ -97,8 +92,8 @@ if __name__ == '__main__':
     flights = []
     while True:
         while sunny:
-            flights = flightsinmonchengladbachsunny()
-            flights_old = checkflights(flights, flights_old)
+            flights = flightsinmonchengladbachSunny()
+            flights, flights_old = checkflights(flights, flights_old)
         while not sunny:
             flights = flightsinmonchengladbachCloudy()
             flights, flights_old = checkflights(flights, flights_old)

@@ -35,6 +35,7 @@ def flightsinmonchengladbachCloudy():
 
 def new_flight_in_area():
     len(flights) > len(flights_old)
+    #TODO: Make function
 
 
 def print_flights(flights, flights_old):
