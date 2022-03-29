@@ -1,8 +1,5 @@
-import tkinter
 from winotify import Notification, audio
 from FlightRadar24.api import FlightRadar24API
-from tkinter import *
-from tkinter import messagebox
 
 # flightradar setup
 fr_api = FlightRadar24API()
@@ -11,27 +8,13 @@ fr_api = FlightRadar24API()
 toast = Notification(app_id="Look out the window!", title="")
 toast.set_audio(audio.Default, loop=False)
 
-# tkinter setup
-sunny = False
-win = Tk()
-win.title('Flights')
-win.geometry("200x200")
-win.resizable(0, 0)
 
-
-def setsunny(choice):
-    global sunny
-    sunny = choice
-    if sunny:
-        messagebox.showinfo("Changed weather condition", "You set the weather to sunny")
-    if not sunny:
-        messagebox.showinfo("Changed weather condition", "You set the weather to cloudy")
+def set_weather():
+    sunny = bool(input("Please Choose your weather.\n(1) Sunny (0) Cloudy"))
     return sunny
 
 
-buttonSunny = tkinter.Button(win, text='Sunny', command=lambda: setsunny(True), width=10).pack()
-buttonCloudy = tkinter.Button(win, text='Cloudy', command=lambda: setsunny(False), width=10).pack()
-win.mainloop()
+
 
 
 def flightsinmonchengladbachsunny():
