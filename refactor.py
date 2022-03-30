@@ -10,8 +10,11 @@ toast.set_audio(audio.Default, loop=False)
 
 
 def set_weather():
-    sunny = int(input("Please Choose your weather.\n(1) Sunny (0) Cloudy\n"))
-    return bool(sunny)
+    sunny = bool(input("Please Choose your weather.\n(1) Sunny (0) Cloudy\n"))
+    return sunny
+
+
+
 
 
 def flightsinmonchengladbachsunny():
@@ -27,54 +30,49 @@ def flightsinmonchengladbachCloudy():
     bounds_mgl = fr_api.get_bounds(monchengladbach)
     flights = fr_api.get_flights(bounds=bounds_mgl)
     for flight in flights:
-        if flight.altitude >= 7000:
+        if flight.altitude >= 5000:
             flights.remove(flight)
 
     return flights
 
 
-def new_flight_in_area():
-    len(flights) > len(flights_old)
-    #TODO: Make function
-
-
-def print_flights(flights, flights_old):
+def checkflights(flights, flights_old):
     TWENTY_MINS_IN_SEC = 1200
-    newest_flight = flights[-1];
     # TODO: Make console output correct
-    if new_flight_in_area():
+    if len(flights) > len(flights_old):
         print("New flight")
-        details = fr_api.get_flight_details(flight_id=newest_flight.id)
-        try:
-            newest_flight.set_flight_details(details)
-            flightdetail = f"from: {newest_flight.origin_airport_name}, {newest_flight.origin_airport_country_name}\n" \
-                           f"to: {newest_flight.destination_airport_name}, {newest_flight.destination_airport_country_name}"
-            if newest_flight.altitude <= 6000:
-                if newest_flight.time + TWENTY_MINS_IN_SEC > newest_flight.time_details['estimated']['arrival']:
-                    height = "landing"
+        for flight in flights[len(flights_old):]:
+            details = fr_api.get_flight_details(flight_id=flight.id)
+            try:
+                flight.set_flight_details(details)
+                flightdetail = f"from: {flight.origin_airport_name}, {flight.origin_airport_country_name}\n" \
+                               f"to: {flight.destination_airport_name}, {flight.destination_airport_country_name}"
+                if flight.altitude <= 5000:
+                    if flight.time + TWENTY_MINS_IN_SEC > flight.time_details['scheduled']['arrival']:
+                        height = "landing"
+                    else:
+                        height = "take-off"
                 else:
-                    height = "take-off"
-            else:
-                height = "high in the air"
-            print(f"{flightdetail}\n{height}\n_______________________________________")
-            toast = Notification(
-                app_id="Look out of the Window!",
-                title=f"{newest_flight.number}, {height}",
-                msg=flightdetail,
-                duration='long',
+                    height = "high in the air"
+                print(f"{flightdetail}\n{height}\n_______________________________________")
+                toast = Notification(
+                    app_id="Look out of the Window!",
+                    title=f"{flight.number}, {height}",
+                    msg=flightdetail,
+                    duration='long',
 
-            )
-            toast.add_actions(label="more details",
-                              launch=f"https://www.flightradar24.com/{newest_flight.id}")
-            toast.show()
+                )
+                toast.add_actions(label="more details",
+                                  launch=f"https://www.flightradar24.com/{flight.id}")
+                toast.show()
 
-        except:
-            print("No details available\n____________________________")
+            except:
+                print("No details available\n____________________________")
         flights_old = flights
-
     else:
         flights_old = flights
-        return flights_old
+    return flights_old
+
 
 if __name__ == '__main__':
     sunny = set_weather()
@@ -83,7 +81,7 @@ if __name__ == '__main__':
     while True:
         while sunny:
             flights = flightsinmonchengladbachsunny()
-            flights_old = print_flights(flights, flights_old)
+            flights_old = checkflights(flights, flights_old)
         while not sunny:
             flights = flightsinmonchengladbachCloudy()
-            flights_old = print_flights(flights, flights_old)
+            flights, flights_old = checkflights(flights, flights_old)
